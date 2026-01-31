@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Crowd-Unlocked Menu Board</title>
+<style>
+  body { font-family: Arial, sans-serif; padding: 20px; background: #f9f9f9; }
+  h1 { text-align: center; margin-bottom: 30px; }
+  .dish { border: 1px solid #ddd; border-radius: 10px; padding: 15px; margin-bottom: 20px; background-color: #ffe6e6; }
+  .dish.unlocked { background-color: #e6ffe6; }
+  .dish h2 { margin: 0 0 10px 0; }
+  .status { font-weight: bold; margin-bottom: 10px; }
+  .progress { width: 100%; background: #ddd; height: 20px; border-radius: 10px; overflow: hidden; margin-bottom: 10px; }
+  .progress-bar { height: 100%; width: 0%; background: #4caf50; transition: width 0.3s; }
+  button { padding: 10px 20px; font-size: 16px; border-radius: 5px; cursor: pointer; }
+</style>
+</head>
+<body>
+
+<h1>Crowd-Unlocked Menu Board</h1>
+
+<div class="dish" id="dish1">
+  <h2>Spicy Street Chicken</h2>
+  <p class="status">Status: LOCKED</p>
+  <div class="progress"><div class="progress-bar" id="progress1"></div></div>
+  <button onclick="likeDish('dish1', 'spicy-street-chicken', 'Spicy Street Chicken', 'progress1')">Like 👍</button>
+</div>
+
+<div class="dish" id="dish2">
+  <h2>Sweet Teriyaki Salmon</h2>
+  <p class="status">Status: LOCKED</p>
+  <div class="progress"><div class="progress-bar" id="progress2"></div></div>
+  <button onclick="likeDish('dish2', 'sweet-teriyaki-salmon', 'Sweet Teriyaki Salmon', 'progress2')">Like 👍</button>
+</div>
+
+<div class="dish" id="dish3">
+  <h2>Vegan Buddha Bowl</h2>
+  <p class="status">Status: LOCKED</p>
+  <div class="progress"><div class="progress-bar" id="progress3"></div></div>
+  <button onclick="likeDish('dish3', 'vegan-buddha-bowl', 'Vegan Buddha Bowl', 'progress3')">Like 👍</button>
+</div>
+
+<script>
+  // Replace with your x402 webhook URL
+  const webhookURL = "https://www.x402.jobs/jobs/20119fda-b5dd-4a40-9206-d9ab2bb19a73/webhook";
+
+  const likesRequired = 30;
+
+  async function likeDish(dishId, menu_item_id, menu_item_name, progressId) {
+    const user_id = "guest_" + Math.floor(Math.random() * 10000);
+
+    const payload = {
+      menu_item_id,
+      menu_item_name,
+      user_id,
+      likes_required: likesRequired
+    };
+
+    try {
+      const res = await fetch(webhookURL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+
+      const data = await res.json();
+
+      const dishDiv = document.getElementById(dishId);
+      const statusEl = dishDiv.querySelector(".status");
+      const progressBar = document.getElementById(progressId);
+
+      // Update progress bar
+      const percent = Math.min((data.current_likes / likesRequired) * 100, 100);
+      progressBar.style.width = percent + "%";
+
+      // Update status
+      statusEl.textContent = "Status: " + data.status;
+      dishDiv.className = "dish " + (data.unlocked ? "unlocked" : "");
+    } catch (err) {
+      alert("Error: " + err);
+    }
+  }
+</script>
+
+</body>
+</html>
