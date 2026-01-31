@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Crowd-Unlocked Menu Board</title>
+<title>Crowd-Unlocked Menu Demo</title>
 <style>
   body { font-family: Arial, sans-serif; padding: 20px; background: #f9f9f9; }
   h1 { text-align: center; margin-bottom: 30px; }
@@ -18,7 +18,7 @@
 </head>
 <body>
 
-<h1>Crowd-Unlocked Menu Board</h1>
+<h1>Crowd-Unlocked Menu Demo</h1>
 
 <div class="dish" id="dish1">
   <h2>Spicy Street Chicken</h2>
@@ -42,8 +42,9 @@
 </div>
 
 <script>
-  // Replace with your x402 webhook URL
-  const webhookURL = "https://www.x402.jobs/jobs/20119fda-b5dd-4a40-9206-d9ab2bb19a73/webhook";
+  // ✅ CORS proxy to bypass browser security for x402 webhook
+  const proxyURL = "https://cors-anywhere.herokuapp.com/";
+  const webhookURL = proxyURL + "https://www.x402.jobs/jobs/20119fda-b5dd-4a40-9206-d9ab2bb19a73/webhook";
 
   const likesRequired = 30;
 
@@ -65,6 +66,27 @@
       });
 
       const data = await res.json();
+
+      const dishDiv = document.getElementById(dishId);
+      const statusEl = dishDiv.querySelector(".status");
+      const progressBar = document.getElementById(progressId);
+
+      // Update progress bar
+      const percent = Math.min((data.current_likes / likesRequired) * 100, 100);
+      progressBar.style.width = percent + "%";
+
+      // Update status
+      statusEl.textContent = "Status: " + data.status;
+      dishDiv.className = "dish " + (data.unlocked ? "unlocked" : "");
+
+    } catch (err) {
+      alert("Failed to fetch from x402 webhook. Make sure your job URL is correct and the proxy is working.\n\nError: " + err);
+    }
+  }
+</script>
+
+</body>
+</html>      const data = await res.json();
 
       const dishDiv = document.getElementById(dishId);
       const statusEl = dishDiv.querySelector(".status");
